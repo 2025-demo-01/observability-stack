@@ -1,1 +1,25 @@
-
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: trading-api-alerts
+  namespace: observability
+spec:
+  groups:
+    - name: trading-api-alerts
+      rules:
+        - alert: TradingApiLatencyHighP95
+          expr: trading_api:latency_ms:p95 > 50
+          for: 3m
+          labels:
+            severity: warning
+            owner: trading
+          annotations:
+            summary: "trading_api p95 latency"
+        - alert: TradingApiLatencyHighP99
+          expr: trading_api:latency_ms:p99 > 120
+          for: 3m
+          labels:
+            severity: critical
+            owner: trading
+          annotations:
+            summary: "trading_api p99 latency"
