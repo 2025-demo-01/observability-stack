@@ -1,1 +1,15 @@
-
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: trading-api-rules
+  namespace: observability
+spec:
+  groups:
+    - name: trading-api
+      rules:
+        - record: trading_api:latency_ms:p95
+          expr: histogram_quantile(0.95, sum by (le) (rate(exchange_trading_api_latency_ms_bucket[5m])))
+        - record: trading_api:latency_ms:p99
+          expr: histogram_quantile(0.99, sum by (le) (rate(exchange_trading_api_latency_ms_bucket[5m])))
+        - record: trading_api:requests_per_s
+          expr: sum(rate(http_requests_total{job="trading-api"}[1m]))
