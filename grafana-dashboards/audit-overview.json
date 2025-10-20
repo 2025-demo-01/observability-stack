@@ -1,1 +1,21 @@
-
+{
+  "title": "SLO Overview",
+  "schemaVersion": 39,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Availability (5m)",
+      "targets": [
+        { "expr": "slo:availability_ratio" }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Burn Rate (5m/30m)",
+      "targets": [
+        { "expr": "slo:burnrate_5m" },
+        { "expr": "slo:burnrate_30m" }
+      ]
+    }
+  ]
+}
