@@ -1,1 +1,15 @@
-
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: slo-errorbudget-rules
+  namespace: observability
+spec:
+  groups:
+    - name: slo
+      rules:
+        - record: slo:availability_ratio
+          expr: 1 - (sum(rate(http_requests_total{status!~"2.."}[5m])) / sum(rate(http_requests_total[5m])))
+        - record: slo:burnrate_5m
+          expr: (1 - slo:availability_ratio) / (1 - 0.9995)
+        - record: slo:burnrate_30m
+          expr: (1 - (1 - (sum(rate(http_requests_total{status!~"2.."}[30m])) / sum(rate(http_requests_total[30m]))))) / (1 - 0.9995)
