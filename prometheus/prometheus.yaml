@@ -1,4 +1,3 @@
-# observability-stack/prometheus/prometheus.yaml
 apiVersion: v1
 kind: Namespace
 metadata:
