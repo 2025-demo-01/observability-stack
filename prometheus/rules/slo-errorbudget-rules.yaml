@@ -1,5 +1,5 @@
 apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
+kind: PrometheusRule 
 metadata:
   name: slo-errorbudget-rules
   namespace: observability
