@@ -1,1 +1,14 @@
-
+{
+  "title": "Trading API Latency",
+  "schemaVersion": 39,
+  "panels": [
+    {
+      "type": "graph",
+      "title": "p95 / p99 latency (ms)",
+      "targets": [
+        { "expr": "trading_api:latency_ms:p95" },
+        { "expr": "trading_api:latency_ms:p99" }
+      ]
+    }
+  ]
+}
