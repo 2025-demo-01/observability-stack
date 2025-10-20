@@ -1,1 +1,41 @@
-
+# observability-stack/prometheus/prometheus.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observability
+---
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: exchange-prom
+  namespace: observability
+spec:
+  replicas: 2
+  serviceAccountName: prometheus-k8s
+  serviceMonitorSelector: {}
+  ruleSelector: {}
+  retention: 15d
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 50Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: exchange-prom
+  namespace: observability
+spec:
+  selector:
+    prometheus: exchange-prom
+  ports:
+    - name: web
+      port: 9090
+      targetPort: 9090
