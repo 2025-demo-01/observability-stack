@@ -1,1 +1,13 @@
-
+{
+  "title": "Wallet Operations",
+  "schemaVersion": 39,
+  "panels": [
+    {
+      "type": "graph",
+      "title": "withdraw queue p95 (s)",
+      "targets": [
+        { "expr": "wallet:withdraw_queue_time_s:p95" }
+      ]
+    }
+  ]
+}
