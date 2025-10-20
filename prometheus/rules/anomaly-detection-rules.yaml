@@ -1,1 +1,11 @@
-
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: anomaly-detection-rules
+  namespace: observability
+spec:
+  groups:
+    - name: anomaly
+      rules:
+        - record: trading_api:syscall_latency_ns:avg
+          expr: avg(rate(trading_api_syscall_latency_ns_sum[1m]) / rate(trading_api_syscall_latency_ns_count[1m]))
