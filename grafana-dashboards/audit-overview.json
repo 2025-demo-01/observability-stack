@@ -1,21 +1,104 @@
 {
-  "title": "SLO Overview",
+  "title": "Audit Overview",
   "schemaVersion": 39,
+  "tags": ["security", "audit", "compliance"],
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
   "panels": [
     {
-      "type": "stat",
-      "title": "Availability (5m)",
+      "type": "table",
+      "title": "Recent API Access (kube-apiserver audit)",
+      "datasource": "Loki",
       "targets": [
-        { "expr": "slo:availability_ratio" }
-      ]
+        {
+          "expr": "{app=\"loki\", filename=~\".*audit.*\"} | json | line_format \"{{.user.username}} | {{.verb}} | {{.objectRef.resource}} | {{.objectRef.namespace}}\""
+        }
+      ],
+      "columns": [
+        { "text": "User" },
+        { "text": "Verb" },
+        { "text": "Resource" },
+        { "text": "Namespace" }
+      ],
+      "options": {
+        "showHeader": true
+      }
     },
     {
       "type": "graph",
-      "title": "Burn Rate (5m/30m)",
+      "title": "Audit Events per Minute",
       "targets": [
-        { "expr": "slo:burnrate_5m" },
-        { "expr": "slo:burnrate_30m" }
+        {
+          "expr": "sum(rate(audit_events_total[1m]))"
+        }
+      ],
+      "yaxes": [
+        { "format": "short" },
+        { "format": "short" }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Failed Auth / Forbidden Access",
+      "datasource": "Loki",
+      "targets": [
+        {
+          "expr": "{app=\"loki\", filename=~\".*audit.*\"} |= \"forbidden\""
+        }
+      ],
+      "options": {
+        "showHeader": true
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Unique Admin Accounts (6h)",
+      "targets": [
+        {
+          "expr": "count(count_over_time({app=\"loki\", filename=~\".*audit.*\"} | json | user.username =~ `admin.*` [6h]))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        }
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Cluster Role Bind Changes",
+      "targets": [
+        {
+          "expr": "count_over_time({app=\"loki\", filename=~\".*audit.*\"} |= \"ClusterRoleBinding\" [1h])"
+        }
+      ],
+      "yaxes": [
+        { "format": "short" },
+        { "format": "short" }
       ]
     }
-  ]
+  ],
+  "templating": {
+    "list": [
+      {
+        "type": "query",
+        "name": "namespace",
+        "label": "Namespace",
+        "datasource": "Loki",
+        "query": "label_values(namespace)"
+      }
+    ]
+  },
+  "refresh": "1m",
+  "annotations": {
+    "list": [
+      {
+        "name": "Deployments",
+        "datasource": "Loki",
+        "expr": "{filename=~\".*audit.*\"} |~ \"Deployment\" | json | line_format \"{{.requestReceivedTimestamp}} {{.user.username}} deployed {{.objectRef.name}}\""
+      }
+    ]
+  }
 }
