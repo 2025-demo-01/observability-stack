@@ -1,1 +1,17 @@
-
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: kafka-alerts
+  namespace: observability
+spec:
+  groups:
+    - name: kafka-alerts
+      rules:
+        - alert: KafkaConsumerLagHigh
+          expr: kafka:consumer_lag > 1000
+          for: 5m
+          labels:
+            severity: critical
+            owner: data
+          annotations:
+            summary: "consumer lag 노파노팍"
