@@ -1,1 +1,17 @@
-
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: wallet-alerts
+  namespace: observability
+spec:
+  groups:
+    - name: wallet-alerts
+      rules:
+        - alert: WalletWithdrawDelayHigh
+          expr: wallet:withdraw_queue_time_s:p95 > 120
+          for: 10m
+          labels:
+            severity: warning
+            owner: wallet
+          annotations:
+            summary: "withdraw queue delay ㅈ느려터져죽겟노"
